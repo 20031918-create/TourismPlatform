@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Home";
+}
+
+<!-- Hero Section -->
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Discover Your Next Adventure</h1>
+        <p class="lead mb-4">Explore amazing destinations and create unforgettable memories</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="@Url.Action("Index", "TourPackage")" class="btn btn-light btn-lg">
+                <i class="fas fa-search"></i> Browse Tours
+            </a>
+            @if (!Request.IsAuthenticated)
+            {
+                <a href="@Url.Action("Register", "Account")" class="btn btn-outline-light btn-lg">
+                    <i class="fas fa-user-plus"></i> Join Now
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Group Members Section -->
+
+
+<!-- Featured Tours Section -->
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Featured Tour Packages</h2>
+        <p class="text-muted">Handpicked destinations for your next journey</p>
+    </div>
+
+    @if (ViewBag.FeaturedPackages != null && ViewBag.FeaturedPackages.Count > 0)
+    {
+        <div class="row g-4">
+            @foreach (var package in ViewBag.FeaturedPackages)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        @if (!string.IsNullOrEmpty(package.ImageUrl))
+                        {
+                            <img src="@package.ImageUrl" class="card-img-top" alt="@package.PackageName">
+                        }
+                        else
+                        {
+                            <img src="https://via.placeholder.com/400x200?text=@package.Destination" class="card-img-top" alt="@package.PackageName">
+                        }
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@package.PackageName</h5>
+                            <p class="card-text text-muted">
+                                <i class="fas fa-map-marker-alt"></i> @package.Destination
+                            </p>
+                            <p class="card-text flex-grow-1">
+                                @(package.Description.Length > 100 ? package.Description.Substring(0, 100) + "..." : package.Description)
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <span class="badge bg-info">@package.DurationDays Days</span>
+                                    <span class="badge bg-success">@package.AvailableSlots slots left</span>
+                                </div>
+                                <h5 class="text-primary mb-0">@package.PricePerPerson.ToString("C")</h5>
+                            </div>
+                            <a href="@Url.Action("Details", "TourPackage", new { id = package.Id })" class="btn btn-primary mt-3">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-compass fa-4x text-muted mb-3"></i>
+            <p class="text-muted">No tour packages available at the moment. Check back soon!</p>
+        </div>
+    }
+
+    <div class="text-center mt-4">
+        <a href="@Url.Action("Index", "TourPackage")" class="btn btn-outline-primary btn-lg">
+            View All Tours <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-4 text-center">
+            <div class="p-4">
+                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                <h4>Secure Booking</h4>
+                <p class="text-muted">Your bookings and payments are safe and secure with us</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="p-4">
+                <i class="fas fa-star fa-3x text-warning mb-3"></i>
+                <h4>Verified Agencies</h4>
+                <p class="text-muted">All travel agencies are thoroughly verified and trusted</p>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="p-4">
+                <i class="fas fa-headset fa-3x text-success mb-3"></i>
+                <h4>24/7 Support</h4>
+                <p class="text-muted">Our customer support team is always here to help you</p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@model TourismPlatform.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0"><i class="fas fa-user-plus"></i> Create an Account</h3>
+                </div>
+                <div class="card-body p-4">
+                    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "needs-validation", role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary("", new { @class = "alert alert-danger" })
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.FullName, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter your full name" })
+                            @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", type = "email", placeholder = "Enter your email" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Create a password" })
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                            <small class="form-text text-muted">Password must be at least 6 characters long</small>
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "Confirm your password" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.UserType, new { @class = "form-label" })
+                            <select name="UserType" id="UserType" class="form-select" required>
+                                <option value="">-- Select User Type --</option>
+                                <option value="Tourist">Tourist</option>
+                                <option value="TravelAgency">Travel Agency / Tour Guide</option>
+                            </select>
+                            @Html.ValidationMessageFor(m => m.UserType, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.ContactNumber, new { @class = "form-label" })
+                            @Html.TextBoxFor(m => m.ContactNumber, new { @class = "form-control", type = "tel", placeholder = "Enter contact number" })
+                            @Html.ValidationMessageFor(m => m.ContactNumber, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div id="agencyFields" style="display: none;">
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.AgencyName, new { @class = "form-label" })
+                                @Html.TextBoxFor(m => m.AgencyName, new { @class = "form-control", placeholder = "Enter agency name" })
+                                @Html.ValidationMessageFor(m => m.AgencyName, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(m => m.AgencyDescription, new { @class = "form-label" })
+                                @Html.TextAreaFor(m => m.AgencyDescription, new { @class = "form-control", rows = "3", placeholder = "Brief description of your agency" })
+                                @Html.ValidationMessageFor(m => m.AgencyDescription, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Register
+                            </button>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">Already have an account? <a href="@Url.Action("Login", "Account")">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(function () {
+            $('#UserType').change(function () {
+                if ($(this).val() === 'TravelAgency') {
+                    $('#agencyFields').slideDown();
+                    $('#AgencyName').attr('required', true);
+                } else {
+                    $('#agencyFields').slideUp();
+                    $('#AgencyName').attr('required', false);
+                }
+            });
+        });
+    </script>
+}

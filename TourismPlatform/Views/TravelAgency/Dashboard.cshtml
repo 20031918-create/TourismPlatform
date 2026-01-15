@@ -1,0 +1,160 @@
+﻿@model TourismPlatform.Models.TravelAgency
+@{
+    ViewBag.Title = "Agency Dashboard";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="fw-bold">
+                <i class="fas fa-tachometer-alt"></i> Welcome, @Model.AgencyName
+            </h2>
+            <p class="text-muted">Manage your tour packages and bookings</p>
+        </div>
+        <div class="col-auto">
+            <a href="@Url.Action("Create", "TourPackage")" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Create New Tour Package
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <h3>@ViewBag.TotalPackages</h3>
+                <p><i class="fas fa-box"></i> Total Packages</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <h3>@ViewBag.ActivePackages</h3>
+                <p><i class="fas fa-check-circle"></i> Active Packages</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <h3>@ViewBag.TotalBookings</h3>
+                <p><i class="fas fa-calendar-check"></i> Total Bookings</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card info">
+                <h3>@ViewBag.TotalRevenue.ToString("C")</h3>
+                <p><i class="fas fa-dollar-sign"></i> Total Revenue</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Bookings -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt"></i> Recent Bookings</h5>
+                    <a href="@Url.Action("ManageBookings")" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.RecentBookings != null && ViewBag.RecentBookings.Count > 0)
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tourist</th>
+                                        <th>Package</th>
+                                        <th>Date</th>
+                                        <th>Participants</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var booking in ViewBag.RecentBookings)
+                                    {
+                                        <tr>
+                                            <td>@booking.Tourist.User.FullName</td>
+                                            <td>@booking.TourPackage.PackageName</td>
+                                            <td>@booking.BookingDate.ToString("dd MMM yyyy")</td>
+                                            <td>@booking.NumberOfParticipants</td>
+                                            <td>
+                                                @if (booking.BookingStatus == "Confirmed")
+                                                {
+                                                    <span class="badge bg-success">@booking.BookingStatus</span>
+                                                }
+                                                else if (booking.BookingStatus == "Pending")
+                                                {
+                                                    <span class="badge bg-warning">@booking.BookingStatus</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">@booking.BookingStatus</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "Booking", new { id = booking.Id })" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted text-center py-4">No bookings yet</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-3">
+                        <a href="@Url.Action("Create", "TourPackage")" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create Tour Package
+                        </a>
+                        <a href="@Url.Action("ManageBookings")" class="btn btn-outline-primary">
+                            <i class="fas fa-tasks"></i> Manage Bookings
+                        </a>
+                        <a href="@Url.Action("ViewFeedbacks")" class="btn btn-outline-primary">
+                            <i class="fas fa-comments"></i> View Feedbacks
+                        </a>
+                        <a href="@Url.Action("Profile")" class="btn btn-outline-primary">
+                            <i class="fas fa-user-edit"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Agency Info</h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <strong>Status:</strong>
+                        @if (Model.IsVerified)
+                        {
+                            <span class="badge bg-success"><i class="fas fa-check-circle"></i> Verified</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Pending Verification</span>
+                        }
+                    </p>
+                    <p><strong>Contact:</strong> @Model.ContactNumber</p>
+                    <p><strong>Member Since:</strong> @Model.RegistrationDate.ToString("MMM yyyy")</p>
+                    <p class="mb-0"><strong>Pending Bookings:</strong> @ViewBag.PendingBookings</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
