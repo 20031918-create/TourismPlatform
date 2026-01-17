@@ -7,7 +7,7 @@
 
     internal sealed class Configuration : DbMigrationsConfiguration<TourismPlatform.Models.ApplicationDbContext>
     {
-        public Configuration()
+        public Configurations()
         {
             AutomaticMigrationsEnabled = false;
         }
