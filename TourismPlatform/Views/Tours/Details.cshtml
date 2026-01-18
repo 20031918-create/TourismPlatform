@@ -1,0 +1,22 @@
+﻿@model TourismPlatform.Models.Tour
+@{
+    ViewBag.Title = "Tour Details";
+}
+
+<h2>@Model.Title</h2>
+
+<p>
+    <strong>Location:</strong> @Model.Location<br />
+    <strong>Category:</strong> @Model.Category<br />
+    <strong>Duration:</strong> @Model.DurationHours hrs<br />
+    <strong>Rating:</strong> @Model.Rating<br />
+    <strong>Price:</strong> $@Model.Price
+</p>
+
+<hr />
+
+<p>@Model.LongDescription</p>
+
+<p style="margin-top:15px;">
+    <a href="@Url.Action("Index", "Tours")">← Back to Tours</a>
+</p>
