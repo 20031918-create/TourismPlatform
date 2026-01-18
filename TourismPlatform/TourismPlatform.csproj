@@ -264,6 +264,8 @@
     <Content Include="Views\TravelAgency\Dashboard.cshtml" />
     <Content Include="Views\TravelAgency\Profile.cshtml" />
     <Content Include="Views\Tourist\Dashboard.cshtml" />
+    <Content Include="Views\Index.cshtml" />
+    <Content Include="Views\TourPackage\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
