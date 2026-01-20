@@ -1,6 +1,69 @@
-﻿@{
+﻿@model IEnumerable<TourismPlatform.Models.TourPackage>
+
+@{
     ViewBag.Title = "Tour Packages";
 }
 
 <h2>Tour Packages</h2>
-<p>TourPackage Index page is working.</p>
+
+@using (Html.BeginForm("Index", "TourPackage", FormMethod.Get))
+{
+    <div style="margin-bottom:12px;">
+        <input type="text"
+               name="searchString"
+               value="@Request["searchString"]"
+               placeholder="Search by name or description"
+               style="width:300px;" />
+
+        <select name="destination">
+            <option value="">All Destinations</option>
+            @if (ViewBag.Destinations != null)
+            {
+                foreach (var d in (List<string>)ViewBag.Destinations)
+                {
+                    <option value="@d" @(Request["destination"] == d ? "selected" : "")>@d</option>
+                }
+            }
+        </select>
+
+        <button type="submit">Search</button>
+        <a href="@Url.Action("Index", "TourPackage")">Clear</a>
+    </div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <p>No tour packages available right now.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Package</th>
+                <th>Destination</th>
+                <th>Price</th>
+                <th>Slots</th>
+                <th>Agency</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.PackageName</td>
+                    <td>@p.Destination</td>
+                    <td>@p.PricePerPerson</td>
+                    <td>@p.AvailableSlots</td>
+                    <td>@(p.TravelAgency != null ? p.TravelAgency.User.FullName : "—")</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("Details", "TourPackage", new { id = p.Id })">
+                            View
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
