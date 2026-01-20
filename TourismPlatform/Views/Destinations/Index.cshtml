@@ -1,0 +1,37 @@
+﻿@{
+    ViewBag.Title = "Destinations";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Destinations</h2>
+    <p>Select a destination to view details.</p>
+
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h4>Sydney</h4>
+                <p>Explore the harbour city.</p>
+                <a class="btn btn-primary"
+                   href="@Url.Action("Details","Destinations", new { name="Sydney" })">View</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h4>Newcastle</h4>
+                <p>Enjoy coastal vibes and beaches.</p>
+                <a class="btn btn-primary"
+                   href="@Url.Action("Details","Destinations", new { name="Newcastle" })">View</a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h4>Perth</h4>
+                <p>Beautiful sunsets and attractions.</p>
+                <a class="btn btn-primary"
+                   href="@Url.Action("Details","Destinations", new { name="Perth" })">View</a>
+            </div>
+        </div>
+    </div>
+</div>

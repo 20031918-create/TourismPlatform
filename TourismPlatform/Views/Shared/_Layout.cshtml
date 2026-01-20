@@ -22,14 +22,22 @@
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("Index", "TourPackage")">Browse Tours</a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Destinations")">Destinations</a>
+                    </li>
+
                     @if (Request.IsAuthenticated)
                     {
                         <li class="nav-item">
                             <a class="nav-link" href="@Url.Action("Dashboard", "Home")">Dashboard</a>
                         </li>
+                
+
                     }
                 </ul>
 
