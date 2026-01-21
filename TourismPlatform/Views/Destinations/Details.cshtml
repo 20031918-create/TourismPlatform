@@ -1,12 +1,31 @@
-﻿@{
+﻿@model TourismPlatform.Models.Destination
+
+@{
     ViewBag.Title = "Destination Details";
 }
 
-<div class="container mt-4">
-    <h2>@ViewBag.Name</h2>
-    <p>Welcome to @ViewBag.Name.</p>
+<h2>@Model.Name</h2>
 
-    <a class="btn btn-secondary" href="@Url.Action("Index","Destinations")">
-        Back
-    </a>
-</div>
+@if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+{
+    <div style="margin: 10px 0;">
+        <img src="@Url.Content(Model.ImageUrl)"
+             alt="@Model.Name"
+             style="max-width: 100%; height: auto; border: 1px solid #ddd; padding: 4px;" />
+    </div>
+}
+
+<p>@Model.Description</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Attractions))
+{
+    <h4>Attractions</h4>
+    <p>@Model.Attractions</p>
+}
+
+<h4>Tour Price</h4>
+<p>@Model.TourPrice</p>
+
+<p>
+    <a class="btn btn-default" href="@Url.Action("Index", "Destinations")">Back to Destinations</a>
+</p>

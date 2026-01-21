@@ -2,35 +2,63 @@
     ViewBag.Title = "Destinations";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-3">Destinations</h2>
-    <p>Select a destination to view details.</p>
+<h2>Explore Destinations</h2>
+<p>Choose your next unforgettable journey.</p>
 
-    <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card p-3">
+<div class="row">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <img class="img-responsive"
+                 src="@Url.Content("~/Images/Sydney.jpg")"
+                 alt="Sydney"
+                 style="width:100%; height:220px; object-fit:cover;" />
+
+            <div class="panel-body">
                 <h4>Sydney</h4>
-                <p>Explore the harbour city.</p>
+                <p>Iconic harbour, Opera House, and stunning beaches.</p>
+
                 <a class="btn btn-primary"
-                   href="@Url.Action("Details","Destinations", new { name="Sydney" })">View</a>
+                   href="@Url.Action("Details", "Destinations", new { id = 1 })">
+                    View Details
+                </a>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-4">
-            <div class="card p-3">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <img class="img-responsive"
+                 src="@Url.Content("~/Images/Newcastle.jpg")"
+                 alt="Newcastle"
+                 style="width:100%; height:220px; object-fit:cover;" />
+
+            <div class="panel-body">
                 <h4>Newcastle</h4>
-                <p>Enjoy coastal vibes and beaches.</p>
+                <p>Relaxed coastal city with beaches and cafes.</p>
+
                 <a class="btn btn-primary"
-                   href="@Url.Action("Details","Destinations", new { name="Newcastle" })">View</a>
+                   href="@Url.Action("Details", "Destinations", new { id = 2 })">
+                    View Details
+                </a>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-4">
-            <div class="card p-3">
+    <div class="col-md-4">
+        <div class="panel panel-default">
+            <img class="img-responsive"
+                 src="@Url.Content("~/Images/Perth.jpg")"
+                 alt="Perth"
+                 style="width:100%; height:220px; object-fit:cover;" />
+
+            <div class="panel-body">
                 <h4>Perth</h4>
-                <p>Beautiful sunsets and attractions.</p>
+                <p>Beautiful sunsets, nature, and relaxed lifestyle.</p>
+
                 <a class="btn btn-primary"
-                   href="@Url.Action("Details","Destinations", new { name="Perth" })">View</a>
+                   href="@Url.Action("Details", "Destinations", new { id = 3 })">
+                    View Details
+                </a>
             </div>
         </div>
     </div>

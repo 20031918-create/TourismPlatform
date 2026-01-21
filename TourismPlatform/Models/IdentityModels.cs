@@ -50,6 +50,8 @@ namespace TourismPlatform.Models
         public DbSet<TourPackage> TourPackages { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
+   
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
