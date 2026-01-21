@@ -9,10 +9,10 @@
     @Styles.Render("~/Content/css")
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="@Url.Action("Index", "Home")">
-                <i class="fas fa-globe-americas"></i> TourismHub
+            <a class="navbar-brand fw-bold" href="@Url.Action("Index", "Home")">
+                <i class="fas fa-globe-americas text-primary"></i> TourismHub
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -20,24 +20,42 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>
+                        <a class="nav-link" href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-home"></i> Home
+                        </a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "TourPackage")">Browse Tours</a>
+                        <a class="nav-link" href="@Url.Action("Index", "TourPackage")">
+                            <i class="fas fa-suitcase"></i> Browse Tours
+                        </a>
                     </li>
-
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Destinations")">Destinations</a>
+                        <a class="nav-link" href="@Url.Action("Index", "Destinations")">
+                            <i class="fas fa-map-marked-alt"></i> Destinations
+                        </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Review", "Home")">
+                            <i class="fas fa-star"></i> Reviews
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("About", "Home")">
+                            <i class="fas fa-info-circle"></i> About
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Contact", "Home")">
+                            <i class="fas fa-envelope"></i> Contact
+                        </a>
+                    </li>
                     @if (Request.IsAuthenticated)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Dashboard", "Home")">Dashboard</a>
+                            <a class="nav-link" href="@Url.Action("Dashboard", "Home")">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
                         </li>
-                
-
                     }
                 </ul>
 
@@ -49,7 +67,6 @@
                                 <i class="fas fa-user-circle"></i> @User.Identity.Name
                             </span>
                         </li>
-
                         <li class="nav-item">
                             @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
                             {
@@ -69,7 +86,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-primary ms-2" href="@Url.Action("Register", "Account")">
-                                Sign Up
+                                <i class="fas fa-user-plus"></i> Sign Up
                             </a>
                         </li>
                     }
@@ -101,20 +118,57 @@
         @RenderBody()
     </div>
 
-    <footer>
+    <footer class="bg-dark text-white py-5 mt-5">
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>Tourism Platform</h5>
-                    <p>Your gateway to amazing travel experiences</p>
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-globe-americas"></i> TourismHub
+                    </h5>
+                    <p class="text-muted">Your gateway to amazing travel experiences. Discover the world with trusted travel agencies and unforgettable tour packages.</p>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-youtube"></i></a>
+                    </div>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <p>&copy; @DateTime.Now.Year - Tourism Platform</p>
-                    <p>
-                        <a href="#">Privacy</a> |
-                        <a href="#">Terms</a> |
-                        <a href="#">Contact</a>
-                    </p>
+                <div class="col-lg-2 col-md-4">
+                    <h6 class="fw-bold mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="@Url.Action("Index", "Home")" class="text-muted text-decoration-none">Home</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Index", "TourPackage")" class="text-muted text-decoration-none">Tours</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Index", "Destinations")" class="text-muted text-decoration-none">Destinations</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Review", "Home")" class="text-muted text-decoration-none">Reviews</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h6 class="fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="@Url.Action("About", "Home")" class="text-muted text-decoration-none">About Us</a></li>
+                        <li class="mb-2"><a href="@Url.Action("Contact", "Home")" class="text-muted text-decoration-none">Contact</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Careers</a></li>
+                        <li class="mb-2"><a href="#" class="text-muted text-decoration-none">Partners</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <h6 class="fw-bold mb-3">Contact Info</h6>
+                    <ul class="list-unstyled text-muted">
+                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> 123 Tourism Street, Melbourne VIC 3000</li>
+                        <li class="mb-2"><i class="fas fa-phone me-2"></i> +61 3 1234 5678</li>
+                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> info@tourismhub.com</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-muted mb-0">&copy; @DateTime.Now.Year TourismHub. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="text-muted text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-muted text-decoration-none me-3">Terms of Service</a>
+                    <a href="#" class="text-muted text-decoration-none">Cookie Policy</a>
                 </div>
             </div>
         </div>

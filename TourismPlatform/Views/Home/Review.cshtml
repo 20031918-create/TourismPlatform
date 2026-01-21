@@ -1,0 +1,328 @@
+﻿@{
+    ViewBag.Title = "Reviews";
+}
+
+<!-- Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">Customer Reviews</h1>
+        <p class="lead">See what our travelers have to say about their experiences</p>
+    </div>
+</div>
+
+<!-- Overall Rating Section -->
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow text-center">
+                <div class="card-body p-5">
+                    <h2 class="display-1 fw-bold text-primary mb-0">4.8</h2>
+                    <div class="mb-3">
+                        <i class="fas fa-star text-warning fa-2x"></i>
+                        <i class="fas fa-star text-warning fa-2x"></i>
+                        <i class="fas fa-star text-warning fa-2x"></i>
+                        <i class="fas fa-star text-warning fa-2x"></i>
+                        <i class="fas fa-star-half-alt text-warning fa-2x"></i>
+                    </div>
+                    <p class="text-muted mb-0">Based on 1,250+ reviews from verified travelers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rating Breakdown -->
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Rating Breakdown</h5>
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">5 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress flex-grow-1" style="height: 10px;">
+                                <div class="progress-bar bg-success" style="width: 75%;"></div>
+                            </div>
+                            <span class="ms-2 text-muted">75%</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">4 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress flex-grow-1" style="height: 10px;">
+                                <div class="progress-bar bg-primary" style="width: 15%;"></div>
+                            </div>
+                            <span class="ms-2 text-muted">15%</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">3 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress flex-grow-1" style="height: 10px;">
+                                <div class="progress-bar bg-info" style="width: 6%;"></div>
+                            </div>
+                            <span class="ms-2 text-muted">6%</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2">2 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress flex-grow-1" style="height: 10px;">
+                                <div class="progress-bar bg-warning" style="width: 3%;"></div>
+                            </div>
+                            <span class="ms-2 text-muted">3%</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">1 <i class="fas fa-star text-warning"></i></span>
+                            <div class="progress flex-grow-1" style="height: 10px;">
+                                <div class="progress-bar bg-danger" style="width: 1%;"></div>
+                            </div>
+                            <span class="ms-2 text-muted">1%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reviews List -->
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold mb-0">Recent Reviews</h3>
+                <select class="form-select w-auto">
+                    <option>Most Recent</option>
+                    <option>Highest Rated</option>
+                    <option>Lowest Rated</option>
+                </select>
+            </div>
+
+            <!-- Review Cards -->
+            @if (ViewBag.Reviews != null && ((IEnumerable<dynamic>)ViewBag.Reviews).Any())
+            {
+                foreach (var review in ViewBag.Reviews)
+                {
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-0">@review.UserName</h6>
+                                        <small class="text-muted">@review.TourName</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="mb-1">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="fas fa-star text-warning"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="far fa-star text-warning"></i>
+                                            }
+                                        }
+                                    </div>
+                                    <small class="text-muted">@review.Date</small>
+                                </div>
+                            </div>
+                            <p class="mb-0">@review.Comment</p>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- Sample Reviews (Static) -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Sarah Johnson</h6>
+                                    <small class="text-muted">Bali Adventure Tour</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                                <small class="text-muted">2 days ago</small>
+                            </div>
+                        </div>
+                        <p class="mb-0">
+                            Amazing experience! The tour guide was incredibly knowledgeable and the itinerary was
+                            perfectly planned. Every detail was taken care of. Highly recommend TourismHub to anyone
+                            looking for a hassle-free travel experience.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Michael Chen</h6>
+                                    <small class="text-muted">Sydney Highlights Package</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="far fa-star text-warning"></i>
+                                </div>
+                                <small class="text-muted">1 week ago</small>
+                            </div>
+                        </div>
+                        <p class="mb-0">
+                            Great value for money! The accommodations were excellent and the agency was very
+                            responsive to all our questions. Would definitely book again through this platform.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-info rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Emily Williams</h6>
+                                    <small class="text-muted">New Zealand Explorer</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                                <small class="text-muted">2 weeks ago</small>
+                            </div>
+                        </div>
+                        <p class="mb-0">
+                            This was a trip of a lifetime! The scenery in New Zealand is breathtaking and our
+                            travel agency made sure we didn't miss any of the highlights. The booking process
+                            was smooth and the customer support was exceptional.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">David Thompson</h6>
+                                    <small class="text-muted">Thailand Beach Getaway</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                </div>
+                                <small class="text-muted">3 weeks ago</small>
+                            </div>
+                        </div>
+                        <p class="mb-0">
+                            Beautiful beaches and great hospitality. The only minor issue was a slight delay
+                            in airport pickup, but the agency handled it professionally. Overall a wonderful
+                            vacation experience!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-danger rounded-circle text-white d-flex align-items-center justify-content-center me-3"
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0">Lisa Anderson</h6>
+                                    <small class="text-muted">Japan Cultural Tour</small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="mb-1">
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                    <i class="fas fa-star text-warning"></i>
+                                </div>
+                                <small class="text-muted">1 month ago</small>
+                            </div>
+                        </div>
+                        <p class="mb-0">
+                            Absolutely incredible! From the temples in Kyoto to the bustling streets of Tokyo,
+                            every moment was magical. The itinerary was well-balanced between cultural experiences
+                            and free time. Can't wait to book my next adventure!
+                        </p>
+                    </div>
+                </div>
+            }
+
+            <!-- Load More Button -->
+            <div class="text-center mt-4">
+                <button class="btn btn-outline-primary btn-lg">
+                    <i class="fas fa-spinner"></i> Load More Reviews
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Write Review CTA -->
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">Share Your Experience</h3>
+        <p class="text-muted mb-4">Have you traveled with us? We'd love to hear about your experience!</p>
+        @if (Request.IsAuthenticated)
+        {
+            <a href="@Url.Action("Dashboard", "Tourist")" class="btn btn-primary btn-lg">
+                <i class="fas fa-pen"></i> Write a Review
+            </a>
+        }
+        else
+        {
+            <a href="@Url.Action("Login", "Account")" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Login to Write a Review
+            </a>
+        }
+    </div>
+</div>

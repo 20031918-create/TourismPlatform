@@ -1,104 +1,196 @@
-﻿using System.Linq;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.Win32;
+using System;
+using System.Net;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
+using System.Web.Optimization;
+using System.Web.Razor.Parser.SyntaxTree;
+using System.Web.UI.WebControls;
 using TourismPlatform.Models;
 
-namespace TourismPlatform.Controllers
+< !DOCTYPE html >
+< html >
+< head >
+    < meta charset = "utf-8" />
+    < meta name = "viewport" content = "width=device-width, initial-scale=1.0" >
+    < title > @ViewBag.Title - Tourism Platform </ title >
+    < link href = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel = "stylesheet" >
+    < link rel = "stylesheet" href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" >
+    @Styles.Render("~/Content/css")
+</ head >
+< body >
+    < nav class= "navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm" >
+        < div class= "container" >
+            < a class= "navbar-brand fw-bold" href = "@Url.Action("Index", "Home")">
+                <i class= "fas fa-globe-americas text-primary" ></ i > TourismHub
+            </ a >
+            < button class= "navbar-toggler" type = "button" data - bs - toggle = "collapse" data - bs - target = "#navbarNav" >
+                < span class= "navbar-toggler-icon" ></ span >
+            </ button >
+            < div class= "collapse navbar-collapse" id = "navbarNav" >
+                < ul class= "navbar-nav me-auto" >
+                    < li class= "nav-item" >
+                        < a class= "nav-link" href = "@Url.Action("Index", "Home")">
+                            <i class= "fas fa-home" ></ i > Home
+                        </ a >
+                    </ li >
+                    < li class= "nav-item" >
+                        < a class= "nav-link" href = "@Url.Action("Index", "TourPackage")">
+                            <i class= "fas fa-suitcase" ></ i > Browse Tours
+                        </ a >
+                    </ li >
+                    < li class= "nav-item" >
+                        < a class= "nav-link" href = "@Url.Action("Index", "Destinations")">
+                            <i class= "fas fa-map-marked-alt" ></ i > Destinations
+                        </ a >
+                    </ li >
+                    < li class= "nav-item" >
+                        < a class= "nav-link" href = "@Url.Action("Review", "Home")">
+                            <i class= "fas fa-star" ></ i > Reviews
+                        </ a >
+                    </ li >
+                    < li class= "nav-item" >
+                        < a class= "nav-link" href = "@Url.Action("About", "Home")">
+                            <i class= "fas fa-info-circle" ></ i > About
+                        </ a >
+                    </ li >
+                    < li class= "nav-item" >
+                        < a class= "nav-link" href = "@Url.Action("Contact", "Home")">
+                            <i class= "fas fa-envelope" ></ i > Contact
+                        </ a >
+                    </ li >
+                    @if(Request.IsAuthenticated)
+                    {
+                        < li class= "nav-item" >
+                            < a class= "nav-link" href = "@Url.Action("Dashboard", "Home")">
+                                <i class= "fas fa-tachometer-alt" ></ i > Dashboard
+                            </ a >
+                        </ li >
+                    }
+                </ ul >
+
+                < ul class= "navbar-nav" >
+                    @if(Request.IsAuthenticated)
+                    {
+                        < li class= "nav-item" >
+                            < span class= "nav-link" >
+                                < i class= "fas fa-user-circle" ></ i > @User.Identity.Name
+                            </ span >
+                        </ li >
+                        < li class= "nav-item" >
+                            @using(Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                            {
+    @Html.AntiForgeryToken()
+    < button type = "submit" class= "btn btn-outline-danger ms-2" >
+
+        < i class= "fas fa-sign-out-alt" ></ i > Logout
+    </ button >
+                            }
+                        </ li >
+                    }
+                    else
 {
-    public class HomeController : Controller
-    {
-        private ApplicationDbContext db = new ApplicationDbContext();
+                        < li class= "nav-item" >
+                            < a class= "nav-link" href = "@Url.Action("Login", "Account")">
+                                <i class= "fas fa-sign-in-alt" ></ i > Login
+                            </ a >
+                        </ li >
+                        < li class= "nav-item" >
+                            < a class= "btn btn-primary ms-2" href = "@Url.Action("Register", "Account")">
+                                <i class= "fas fa-user-plus" ></ i > Sign Up
+                            </ a >
+                        </ li >
+                    }
+                </ ul >
+            </ div >
+        </ div >
+    </ nav >
 
-        public ActionResult Index()
+    < div class= "container-fluid px-0" >
+        @if(TempData["Success"] != null)
         {
-            // Get featured tour packages
-            var featuredPackages = db.TourPackages
-                .Where(tp => tp.IsActive && tp.AvailableSlots > 0)
-                .OrderByDescending(tp => tp.CreatedDate)
-                .Take(6)
-                .ToList();
-
-            ViewBag.FeaturedPackages = featuredPackages;
-
-            // Group members information
-            ViewBag.GroupMembers = new[]
-            {
-                new { StudentId = "12345678", FullName = "Student One" },
-                new { StudentId = "23456789", FullName = "Student Two" },
-                new { StudentId = "34567890", FullName = "Student Three" },
-                new { StudentId = "45678901", FullName = "Student Four" }
-            };
-
-            return View();
+            < div class= "container mt-3" >
+                < div class= "alert alert-success alert-dismissible fade show" role = "alert" >
+                    < i class= "fas fa-check-circle" ></ i > @TempData["Success"]
+                    < button type = "button" class= "btn-close" data - bs - dismiss = "alert" ></ button >
+                </ div >
+            </ div >
+        }
+        @if(TempData["Error"] != null)
+        {
+            < div class= "container mt-3" >
+                < div class= "alert alert-danger alert-dismissible fade show" role = "alert" >
+                    < i class= "fas fa-exclamation-circle" ></ i > @TempData["Error"]
+                    < button type = "button" class= "btn-close" data - bs - dismiss = "alert" ></ button >
+                </ div >
+            </ div >
         }
 
-        [Authorize]
-        public ActionResult Dashboard()
-        {
-            var userId = User.Identity.GetUserId();
-            var user = db.Users.Find(userId);
+        @RenderBody()
+    </ div >
 
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
+    < footer class= "bg-dark text-white py-5 mt-5" >
+        < div class= "container" >
+            < div class= "row g-4" >
+                < div class= "col-lg-4" >
+                    < h5 class= "fw-bold mb-3" >
+                        < i class= "fas fa-globe-americas" ></ i > TourismHub
+                    </ h5 >
+                    < p class= "text-muted" > Your gateway to amazing travel experiences. Discover the world with trusted travel agencies and unforgettable tour packages.</p>
+                    <div class= "d-flex gap-2" >
+                        < a href = "#" class= "btn btn-outline-light btn-sm" >< i class= "fab fa-facebook-f" ></ i ></ a >
+                        < a href = "#" class= "btn btn-outline-light btn-sm" >< i class= "fab fa-twitter" ></ i ></ a >
+                        < a href = "#" class= "btn btn-outline-light btn-sm" >< i class= "fab fa-instagram" ></ i ></ a >
+                        < a href = "#" class= "btn btn-outline-light btn-sm" >< i class= "fab fa-youtube" ></ i ></ a >
+                    </ div >
+                </ div >
+                < div class= "col-lg-2 col-md-4" >
+                    < h6 class= "fw-bold mb-3" > Quick Links </ h6 >
+                    < ul class= "list-unstyled" >
+                        < li class= "mb-2" >< a href = "@Url.Action("Index", "Home")" class= "text-muted text-decoration-none" > Home </ a ></ li >
+                        < li class= "mb-2" >< a href = "@Url.Action("Index", "TourPackage")" class= "text-muted text-decoration-none" > Tours </ a ></ li >
+                        < li class= "mb-2" >< a href = "@Url.Action("Index", "Destinations")" class= "text-muted text-decoration-none" > Destinations </ a ></ li >
+                        < li class= "mb-2" >< a href = "@Url.Action("Review", "Home")" class= "text-muted text-decoration-none" > Reviews </ a ></ li >
+                    </ ul >
+                </ div >
+                < div class= "col-lg-2 col-md-4" >
+                    < h6 class= "fw-bold mb-3" > Company </ h6 >
+                    < ul class= "list-unstyled" >
+                        < li class= "mb-2" >< a href = "@Url.Action("About", "Home")" class= "text-muted text-decoration-none" > About Us </ a ></ li >
+                        < li class= "mb-2" >< a href = "@Url.Action("Contact", "Home")" class= "text-muted text-decoration-none" > Contact </ a ></ li >
+                        < li class= "mb-2" >< a href = "#" class= "text-muted text-decoration-none" > Careers </ a ></ li >
+                        < li class= "mb-2" >< a href = "#" class= "text-muted text-decoration-none" > Partners </ a ></ li >
+                    </ ul >
+                </ div >
+                < div class= "col-lg-4 col-md-4" >
+                    < h6 class= "fw-bold mb-3" > Contact Info </ h6 >
+                    < ul class= "list-unstyled text-muted" >
+                        < li class= "mb-2" >< i class= "fas fa-map-marker-alt me-2" ></ i > 123 Tourism Street, Melbourne VIC 3000</li>
+                        <li class= "mb-2" >< i class= "fas fa-phone me-2" ></ i > +61 3 1234 5678 </ li >
+                        < li class= "mb-2" >< i class= "fas fa-envelope me-2" ></ i > info@tourismhub.com </ li >
+                    </ ul >
+                </ div >
+            </ div >
+            < hr class= "my-4" >
+            < div class= "row align-items-center" >
+                < div class= "col-md-6 text-center text-md-start" >
+                    < p class= "text-muted mb-0" > &copy; @DateTime.Now.Year TourismHub. All rights reserved.</p>
+                </div>
+                <div class= "col-md-6 text-center text-md-end" >
+                    < a href = "#" class= "text-muted text-decoration-none me-3" > Privacy Policy </ a >
+                    < a href = "#" class= "text-muted text-decoration-none me-3" > Terms of Service</a>
+                    <a href = "#" class= "text-muted text-decoration-none" > Cookie Policy </ a >
+                </ div >
+            </ div >
+        </ div >
+    </ footer >
 
-            // Redirect to appropriate dashboard based on user type
-            if (user.UserType == "TravelAgency")
-            {
-                return RedirectToAction("Dashboard", "TravelAgency");
-            }
-            else if (user.UserType == "Tourist")
-            {
-                return RedirectToAction("Dashboard", "Tourist");
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        [Authorize]
-        public ActionResult Profile()
-        {
-            var userId = User.Identity.GetUserId();
-            var user = db.Users.Find(userId);
-
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            // Redirect to appropriate profile based on user type
-            if (user.UserType == "TravelAgency")
-            {
-                return RedirectToAction("Profile", "TravelAgency");
-            }
-            else if (user.UserType == "Tourist")
-            {
-                return RedirectToAction("Profile", "Tourist");
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
-            return View();
-        }
-
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-            return View();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-    }
-}
+    < script src = "https://code.jquery.com/jquery-3.6.0.min.js" ></ script >
+    < script src = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" ></ script >
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</ body >
+</ html >

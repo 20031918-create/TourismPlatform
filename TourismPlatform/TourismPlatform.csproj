@@ -271,6 +271,7 @@
     <Content Include="Views\TourPackage\Create.cshtml" />
     <Content Include="Views\Destinations\Index.cshtml" />
     <Content Include="Views\Destinations\Details.cshtml" />
+    <Content Include="Views\Home\Review.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
