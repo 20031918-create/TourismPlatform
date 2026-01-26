@@ -60,7 +60,7 @@ namespace TourismPlatform.Controllers
         }
 
         // Profile Management
-        public ActionResult Profile()
+        public ActionResult MyProfile()
         {
             var userId = User.Identity.GetUserId();
             var tourist = db.Tourists
@@ -77,31 +77,43 @@ namespace TourismPlatform.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Profile(Tourist model)
+        public ActionResult MyProfile(Tourist model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var userId = User.Identity.GetUserId();
-                var tourist = db.Tourists.Find(userId);
-
-                if (tourist == null)
-                {
-                    return HttpNotFound();
-                }
-
-                tourist.ContactNumber = model.ContactNumber;
-                tourist.Nationality = model.Nationality;
-                tourist.DateOfBirth = model.DateOfBirth;
-                tourist.ProfileImageUrl = model.ProfileImageUrl;
-
-                db.Entry(tourist).State = EntityState.Modified;
-                db.SaveChanges();
-
-                TempData["Success"] = "Profile updated successfully!";
-                return RedirectToAction("Profile");
+                // If your view displays FullName via Model.User.FullName,
+                // you may want to re-load user so it doesn't become null.
+                var uid = User.Identity.GetUserId();
+                var reload = db.Tourists.Include(t => t.User).FirstOrDefault(t => t.Id == uid);
+                return View(reload ?? model);
             }
 
-            return View(model);
+            var userId = User.Identity.GetUserId();
+            var tourist = db.Tourists.Find(userId);
+
+            if (tourist == null)
+            {
+                return HttpNotFound();
+            }
+
+            // Existing fields
+            tourist.ContactNumber = model.ContactNumber;
+            tourist.Nationality = model.Nationality;
+            tourist.DateOfBirth = model.DateOfBirth;
+            tourist.ProfileImageUrl = model.ProfileImageUrl;
+
+            // ✅ NEW: Additional fields (make sure these exist in Tourist model)
+            tourist.Address = model.Address;
+            tourist.City = model.City;
+            tourist.EmergencyContactName = model.EmergencyContactName;
+            tourist.EmergencyContactPhone = model.EmergencyContactPhone;
+            tourist.PassportNumber = model.PassportNumber;
+
+            db.Entry(tourist).State = EntityState.Modified;
+            db.SaveChanges();
+
+            TempData["Success"] = "Profile updated successfully!";
+            return RedirectToAction("MyProfile");
         }
 
         // Submit Feedback
@@ -122,20 +134,17 @@ namespace TourismPlatform.Controllers
                 return HttpNotFound();
             }
 
-            // Check if booking belongs to current user
             if (booking.TouristId != User.Identity.GetUserId())
             {
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
             }
 
-            // Check if feedback already exists
             if (booking.Feedback != null)
             {
                 TempData["Error"] = "You have already submitted feedback for this booking.";
                 return RedirectToAction("MyBookings");
             }
 
-            // Check if booking is completed
             if (booking.BookingStatus != "Completed")
             {
                 TempData["Error"] = "You can only submit feedback for completed bookings.";
@@ -195,7 +204,6 @@ namespace TourismPlatform.Controllers
             booking.BookingStatus = "Cancelled";
             booking.CancellationReason = reason;
 
-            // Restore available slots
             var tourPackage = db.TourPackages.Find(booking.TourPackageId);
             if (tourPackage != null)
             {

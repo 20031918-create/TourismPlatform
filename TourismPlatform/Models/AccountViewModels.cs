@@ -31,6 +31,7 @@ namespace TourismPlatform.Models
         [Required]
         [Display(Name = "Code")]
         public string Code { get; set; }
+
         public string ReturnUrl { get; set; }
 
         [Display(Name = "Remember this browser?")]
@@ -61,7 +62,6 @@ namespace TourismPlatform.Models
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
     }
-
 
     public class RegisterViewModel
     {
@@ -101,24 +101,6 @@ namespace TourismPlatform.Models
         [Display(Name = "Contact Number")]
         public string ContactNumber { get; set; }
     }
-}
-
-        public class LoginViewModel
-        {
-            [Required(ErrorMessage = "Email is required")]
-            [EmailAddress]
-            [Display(Name = "Email")]
-            public string Email { get; set; }
-
-            [Required(ErrorMessage = "Password is required")]
-            [DataType(DataType.Password)]
-            [Display(Name = "Password")]
-            public string Password { get; set; }
-
-            [Display(Name = "Remember me?")]
-            public bool RememberMe { get; set; }
-        }
-    
 
     public class ResetPasswordViewModel
     {
@@ -148,4 +130,4 @@ namespace TourismPlatform.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
-
+}

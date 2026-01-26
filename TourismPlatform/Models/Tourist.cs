@@ -28,6 +28,27 @@ namespace TourismPlatform.Models
         [Display(Name = "Profile Image URL")]
         public string ProfileImageUrl { get; set; }
 
+        // ✅ NEW: Additional profile info
+        [StringLength(200)]
+        [Display(Name = "Address")]
+        public string Address { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "City")]
+        public string City { get; set; }
+
+        [StringLength(100)]
+        [Display(Name = "Emergency Contact Name")]
+        public string EmergencyContactName { get; set; }
+
+        [StringLength(20)]
+        [Display(Name = "Emergency Contact Phone")]
+        public string EmergencyContactPhone { get; set; }
+
+        [StringLength(50)]
+        [Display(Name = "Passport Number")]
+        public string PassportNumber { get; set; }
+
         [Display(Name = "Registration Date")]
         public DateTime RegistrationDate { get; set; }
 
