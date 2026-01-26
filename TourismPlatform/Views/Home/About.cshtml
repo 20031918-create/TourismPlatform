@@ -1,9 +1,168 @@
 ﻿@{
-    ViewBag.Title = "About";
+    ViewBag.Title = "About Us";
 }
-<main aria-labelledby="title">
-    <h2 id="title">@ViewBag.Title.</h2>
-    <h3>@ViewBag.Message</h3>
 
-    <p>Use this area to provide additional information.</p>
-</main>
+<!-- Hero Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container text-center">
+        <h1 class="display-4 fw-bold">About TourismHub</h1>
+        <p class="lead">Your trusted partner in creating unforgettable travel experiences</p>
+    </div>
+</div>
+
+<!-- Our Story Section -->
+<div class="container my-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h2 class="fw-bold mb-4">Our Story</h2>
+            <p class="text-muted">
+                Founded with a passion for travel and exploration, TourismHub has been connecting travelers
+                with amazing destinations and verified travel agencies since 2024. We believe that every
+                journey should be memorable, safe, and hassle-free.
+            </p>
+            <p class="text-muted">
+                Our platform brings together the best travel agencies, curated tour packages, and
+                exceptional destinations to help you discover the world. Whether you're seeking adventure,
+                relaxation, or cultural experiences, we've got you covered.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600"
+                 class="img-fluid rounded shadow" alt="Travel Adventure">
+        </div>
+    </div>
+</div>
+
+<!-- Mission & Vision -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-bullseye fa-3x text-primary mb-3"></i>
+                        <h3 class="fw-bold">Our Mission</h3>
+                        <p class="text-muted">
+                            To make travel accessible, enjoyable, and safe for everyone by connecting
+                            travelers with trusted agencies and providing seamless booking experiences.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-eye fa-3x text-success mb-3"></i>
+                        <h3 class="fw-bold">Our Vision</h3>
+                        <p class="text-muted">
+                            To become the world's most trusted tourism platform, inspiring millions
+                            to explore new destinations and create lifelong memories.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Us -->
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Why Choose TourismHub?</h2>
+        <p class="text-muted">We're committed to making your travel dreams come true</p>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="text-center p-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                    <i class="fas fa-shield-alt fa-2x text-primary"></i>
+                </div>
+                <h5 class="fw-bold">Verified Agencies</h5>
+                <p class="text-muted">All our partner agencies undergo thorough verification to ensure quality service.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center p-4">
+                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                    <i class="fas fa-dollar-sign fa-2x text-success"></i>
+                </div>
+                <h5 class="fw-bold">Best Prices</h5>
+                <p class="text-muted">Compare prices from multiple agencies to find the best deals for your budget.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="text-center p-4">
+                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-4 mb-3">
+                    <i class="fas fa-headset fa-2x text-warning"></i>
+                </div>
+                <h5 class="fw-bold">24/7 Support</h5>
+                <p class="text-muted">Our dedicated support team is always ready to assist you anytime, anywhere.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6">
+                <h2 class="display-4 fw-bold">500+</h2>
+                <p class="mb-0">Tour Packages</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="display-4 fw-bold">100+</h2>
+                <p class="mb-0">Destinations</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="display-4 fw-bold">50+</h2>
+                <p class="mb-0">Travel Agencies</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="display-4 fw-bold">10K+</h2>
+                <p class="mb-0">Happy Travelers</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team Section -->
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Meet Our Team</h2>
+        <p class="text-muted">The passionate people behind TourismHub</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+        @if (ViewBag.GroupMembers != null)
+        {
+            foreach (var member in ViewBag.GroupMembers)
+            {
+                <div class="col-md-3 col-sm-6">
+                    <div class="card border-0 shadow-sm text-center">
+                        <div class="card-body p-4">
+                            <div class="bg-secondary rounded-circle d-inline-flex p-4 mb-3">
+                                <i class="fas fa-user fa-2x text-white"></i>
+                            </div>
+                            <h5 class="fw-bold mb-1">@member.FullName</h5>
+                            <p class="text-muted small mb-0">ID: @member.StudentId</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3">Ready to Start Your Adventure?</h3>
+        <p class="text-muted mb-4">Join thousands of happy travelers who have discovered their dream destinations with us.</p>
+        <a href="@Url.Action("Index", "TourPackage")" class="btn btn-primary btn-lg me-2">
+            <i class="fas fa-search"></i> Explore Tours
+        </a>
+        <a href="@Url.Action("Contact", "Home")" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-envelope"></i> Contact Us
+        </a>
+    </div>
+</div>
