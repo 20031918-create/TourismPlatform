@@ -1,0 +1,116 @@
+﻿@model IEnumerable<TourismPlatform.Models.TourPackage>
+
+@{
+    ViewBag.Title = "My Packages";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-4">My Tour Packages</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        You have not created any tour packages yet.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Package Name</th>
+                <th>Destination</th>
+                <th>Price / Person</th>
+                <th>Duration</th>
+                <th>Slots</th>
+                <th>Status</th>
+                <th style="width:230px;">Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <strong>@item.PackageName</strong><br />
+                        <small class="text-muted">
+                            Created: @item.CreatedDate.ToString("dd MMM yyyy")
+                        </small>
+                    </td>
+
+                    <td>@item.Destination</td>
+
+                    <td>$@item.PricePerPerson</td>
+
+                    <td>@item.DurationDays days</td>
+
+                    <td>
+                        @item.AvailableSlots / @item.MaxGroupSize
+                    </td>
+
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </td>
+
+                    <td>
+                        <!-- EDIT -->
+                        <a class="btn btn-sm btn-primary"
+                           href="@Url.Action("Edit", "TourPackage", new { id = item.Id })">
+                            ✏️ Edit
+                        </a>
+
+                        <!-- DELETE (SOFT) -->
+                        @if (item.IsActive)
+                        {
+                            <a class="btn btn-sm btn-danger"
+                               href="@Url.Action("Delete", "TourPackage", new { id = item.Id })"
+                               onclick="return confirm('Are you sure you want to deactivate this tour package?');">
+                                🗑 Delete
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Deactivated</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<hr />
+
+<div class="mt-3">
+    <a class="btn btn-success"
+       href="@Url.Action("Create", "TourPackage")">
+        ➕ Create New Package
+    </a>
+
+    <a class="btn btn-secondary ms-2"
+       href="@Url.Action("Dashboard", "TravelAgency")">
+        ← Back to Dashboard
+    </a>
+</div>

@@ -24,23 +24,34 @@ namespace TourismPlatform.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            // Get statistics
-            var tourPackages = db.TourPackages.Where(tp => tp.TravelAgencyId == userId).ToList();
-            var bookings = db.Bookings.Where(b => tourPackages.Any(tp => tp.Id == b.TourPackageId)).ToList();
+            // Keep as IQueryable (DO NOT ToList before using in bookings query)
+            var tourQuery = db.TourPackages.Where(tp => tp.TravelAgencyId == userId);
+            var tourIds = tourQuery.Select(tp => tp.Id);
 
-            ViewBag.TotalPackages = tourPackages.Count;
-            ViewBag.ActivePackages = tourPackages.Count(tp => tp.IsActive);
-            ViewBag.TotalBookings = bookings.Count;
-            ViewBag.PendingBookings = bookings.Count(b => b.BookingStatus == "Pending");
-            ViewBag.TotalRevenue = bookings.Where(b => b.PaymentStatus == "Paid").Sum(b => b.TotalAmount);
+            var bookingsQuery = db.Bookings.Where(b => tourIds.Contains(b.TourPackageId));
 
-            ViewBag.RecentBookings = bookings.OrderByDescending(b => b.BookingDate).Take(5).ToList();
+            // Stats
+            ViewBag.TotalPackages = tourQuery.Count();
+            ViewBag.ActivePackages = tourQuery.Count(tp => tp.IsActive);
+
+            ViewBag.TotalBookings = bookingsQuery.Count();
+            ViewBag.PendingBookings = bookingsQuery.Count(b => b.BookingStatus == "Pending");
+
+            // Safe Sum (won't crash if there are 0 paid bookings)
+            ViewBag.TotalRevenue = bookingsQuery
+                .Where(b => b.PaymentStatus == "Paid")
+                .Sum(b => (decimal?)b.TotalAmount) ?? 0m;
+
+            ViewBag.RecentBookings = bookingsQuery
+                .OrderByDescending(b => b.BookingDate)
+                .Take(5)
+                .ToList();
 
             return View(agency);
         }
 
-        // Profile Management
-        public ActionResult Profile()
+        // Profile Management (renamed to avoid warning CS0108)
+        public ActionResult AgencyProfile()
         {
             var userId = User.Identity.GetUserId();
             var agency = db.TravelAgencies.Find(userId);
@@ -50,38 +61,38 @@ namespace TourismPlatform.Controllers
                 return HttpNotFound();
             }
 
-            return View(agency);
+            return View("Profile", agency);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Profile(TravelAgency model)
+        public ActionResult AgencyProfile(TravelAgency model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var userId = User.Identity.GetUserId();
-                var agency = db.TravelAgencies.Find(userId);
-
-                if (agency == null)
-                {
-                    return HttpNotFound();
-                }
-
-                agency.AgencyName = model.AgencyName;
-                agency.Description = model.Description;
-                agency.ServicesOffered = model.ServicesOffered;
-                agency.ContactNumber = model.ContactNumber;
-                agency.Address = model.Address;
-                agency.ProfileImageUrl = model.ProfileImageUrl;
-
-                db.Entry(agency).State = EntityState.Modified;
-                db.SaveChanges();
-
-                TempData["Success"] = "Profile updated successfully!";
-                return RedirectToAction("Profile");
+                return View("Profile", model);
             }
 
-            return View(model);
+            var userId = User.Identity.GetUserId();
+            var agency = db.TravelAgencies.Find(userId);
+
+            if (agency == null)
+            {
+                return HttpNotFound();
+            }
+
+            agency.AgencyName = model.AgencyName;
+            agency.Description = model.Description;
+            agency.ServicesOffered = model.ServicesOffered;
+            agency.ContactNumber = model.ContactNumber;
+            agency.Address = model.Address;
+            agency.ProfileImageUrl = model.ProfileImageUrl;
+
+            db.Entry(agency).State = EntityState.Modified;
+            db.SaveChanges();
+
+            TempData["Success"] = "Profile updated successfully!";
+            return RedirectToAction("AgencyProfile");
         }
 
         // Manage Bookings

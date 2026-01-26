@@ -12,7 +12,9 @@ namespace TourismPlatform.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // Browse all packages (public)
+        // -----------------------------
+        // PUBLIC: Browse all active packages
+        // -----------------------------
         [AllowAnonymous]
         public ActionResult Index(string searchString, string destination)
         {
@@ -20,13 +22,14 @@ namespace TourismPlatform.Controllers
                 .Include(t => t.TravelAgency)
                 .Where(t => t.IsActive && t.AvailableSlots > 0);
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrWhiteSpace(searchString))
             {
-                packages = packages.Where(p => p.PackageName.Contains(searchString) ||
-                                             p.Description.Contains(searchString));
+                packages = packages.Where(p =>
+                    p.PackageName.Contains(searchString) ||
+                    p.Description.Contains(searchString));
             }
 
-            if (!String.IsNullOrEmpty(destination))
+            if (!string.IsNullOrWhiteSpace(destination))
             {
                 packages = packages.Where(p => p.Destination.Contains(destination));
             }
@@ -40,25 +43,22 @@ namespace TourismPlatform.Controllers
             return View(packages.OrderByDescending(p => p.CreatedDate).ToList());
         }
 
-        // Package details (public)
+        // -----------------------------
+        // PUBLIC: Package details
+        // -----------------------------
         [AllowAnonymous]
         public ActionResult Details(int? id)
         {
             if (id == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
-            TourPackage tourPackage = db.TourPackages
+            var tourPackage = db.TourPackages
                 .Include(t => t.TravelAgency.User)
                 .FirstOrDefault(t => t.Id == id);
 
             if (tourPackage == null)
-            {
                 return HttpNotFound();
-            }
 
-            // Get feedbacks for this package
             var feedbacks = db.Feedbacks
                 .Include(f => f.Booking.Tourist.User)
                 .Where(f => f.Booking.TourPackageId == id && f.IsApproved)
@@ -71,10 +71,36 @@ namespace TourismPlatform.Controllers
             return View(tourPackage);
         }
 
-        // Create package (Travel Agency only)
+        // -----------------------------
+        // AGENCY: List my packages (modification options live here)
+        // -----------------------------
+        [Authorize]
+        public ActionResult MyPackages()
+        {
+            var userId = User.Identity.GetUserId();
+
+            // only TravelAgency accounts can access
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
+            var myPackages = db.TourPackages
+                .Where(tp => tp.TravelAgencyId == userId)
+                .OrderByDescending(tp => tp.CreatedDate)
+                .ToList();
+
+            return View(myPackages);
+        }
+
+        // -----------------------------
+        // AGENCY: Create
+        // -----------------------------
         [Authorize]
         public ActionResult Create()
         {
+            var userId = User.Identity.GetUserId();
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
             return View();
         }
 
@@ -83,43 +109,45 @@ namespace TourismPlatform.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(TourPackage tourPackage)
         {
-            if (ModelState.IsValid)
-            {
-                tourPackage.TravelAgencyId = User.Identity.GetUserId();
-                tourPackage.AvailableSlots = tourPackage.MaxGroupSize;
-                tourPackage.CreatedDate = DateTime.Now;
-                tourPackage.IsActive = true;
+            var userId = User.Identity.GetUserId();
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-                db.TourPackages.Add(tourPackage);
-                db.SaveChanges();
+            if (!ModelState.IsValid)
+                return View(tourPackage);
 
-                TempData["Success"] = "Tour package created successfully!";
-                return RedirectToAction("Dashboard", "TravelAgency");
-            }
+            tourPackage.TravelAgencyId = userId;
 
-            return View(tourPackage);
+            // sensible defaults
+            tourPackage.CreatedDate = DateTime.Now;
+            tourPackage.IsActive = true;
+
+            // If you want slots to start equal to max group size:
+            tourPackage.AvailableSlots = tourPackage.MaxGroupSize;
+
+            db.TourPackages.Add(tourPackage);
+            db.SaveChanges();
+
+            TempData["Success"] = "Tour package created successfully!";
+            return RedirectToAction("MyPackages");
         }
 
-        // Edit package (Travel Agency only)
+        // -----------------------------
+        // AGENCY: Edit
+        // -----------------------------
         [Authorize]
         public ActionResult Edit(int? id)
         {
             if (id == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
-            TourPackage tourPackage = db.TourPackages.Find(id);
-            if (tourPackage == null)
-            {
-                return HttpNotFound();
-            }
-
-            // Ensure the tour package belongs to the current user
-            if (tourPackage.TravelAgencyId != User.Identity.GetUserId())
-            {
+            var userId = User.Identity.GetUserId();
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-            }
+
+            var tourPackage = db.TourPackages.FirstOrDefault(tp => tp.Id == id && tp.TravelAgencyId == userId);
+            if (tourPackage == null)
+                return HttpNotFound();
 
             return View(tourPackage);
         }
@@ -127,45 +155,60 @@ namespace TourismPlatform.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(TourPackage tourPackage)
+        public ActionResult Edit(TourPackage model)
         {
-            if (ModelState.IsValid)
-            {
-                // Ensure the tour package belongs to the current user
-                if (tourPackage.TravelAgencyId != User.Identity.GetUserId())
-                {
-                    return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-                }
+            var userId = User.Identity.GetUserId();
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
+                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-                db.Entry(tourPackage).State = EntityState.Modified;
-                db.SaveChanges();
+            // Pull existing record from DB (prevents overposting / tampering)
+            var existing = db.TourPackages.FirstOrDefault(tp => tp.Id == model.Id && tp.TravelAgencyId == userId);
+            if (existing == null)
+                return HttpNotFound();
 
-                TempData["Success"] = "Tour package updated successfully!";
-                return RedirectToAction("Dashboard", "TravelAgency");
-            }
-            return View(tourPackage);
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Update only allowed fields
+            existing.PackageName = model.PackageName;
+            existing.Description = model.Description;
+            existing.Destination = model.Destination;
+            existing.DurationDays = model.DurationDays;
+            existing.PricePerPerson = model.PricePerPerson;
+            existing.StartDate = model.StartDate;
+            existing.EndDate = model.EndDate;
+            existing.MaxGroupSize = model.MaxGroupSize;
+            existing.ImageUrl = model.ImageUrl;
+            existing.Inclusions = model.Inclusions;
+            existing.Exclusions = model.Exclusions;
+            existing.IsActive = model.IsActive;
+
+            // Optional: only set AvailableSlots if you WANT agencies to edit it manually.
+            // If bookings control slots, you may want to remove this line.
+            existing.AvailableSlots = model.AvailableSlots;
+
+            db.SaveChanges();
+
+            TempData["Success"] = "Tour package updated successfully!";
+            return RedirectToAction("MyPackages");
         }
 
-        // Delete package (Travel Agency only)
+        // -----------------------------
+        // AGENCY: Deactivate (soft delete)
+        // -----------------------------
         [Authorize]
         public ActionResult Delete(int? id)
         {
             if (id == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
-            TourPackage tourPackage = db.TourPackages.Find(id);
-            if (tourPackage == null)
-            {
-                return HttpNotFound();
-            }
-
-            // Ensure the tour package belongs to the current user
-            if (tourPackage.TravelAgencyId != User.Identity.GetUserId())
-            {
+            var userId = User.Identity.GetUserId();
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-            }
+
+            var tourPackage = db.TourPackages.FirstOrDefault(tp => tp.Id == id && tp.TravelAgencyId == userId);
+            if (tourPackage == null)
+                return HttpNotFound();
 
             return View(tourPackage);
         }
@@ -175,29 +218,25 @@ namespace TourismPlatform.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            TourPackage tourPackage = db.TourPackages.Find(id);
-
-            // Ensure the tour package belongs to the current user
-            if (tourPackage.TravelAgencyId != User.Identity.GetUserId())
-            {
+            var userId = User.Identity.GetUserId();
+            if (!db.TravelAgencies.Any(a => a.Id == userId))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-            }
 
-            // Soft delete - just mark as inactive
+            var tourPackage = db.TourPackages.FirstOrDefault(tp => tp.Id == id && tp.TravelAgencyId == userId);
+            if (tourPackage == null)
+                return HttpNotFound();
+
+            // Soft delete
             tourPackage.IsActive = false;
-            db.Entry(tourPackage).State = EntityState.Modified;
             db.SaveChanges();
 
-            TempData["Success"] = "Tour package deleted successfully!";
-            return RedirectToAction("Dashboard", "TravelAgency");
+            TempData["Success"] = "Tour package deactivated successfully!";
+            return RedirectToAction("MyPackages");
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                db.Dispose();
-            }
+            if (disposing) db.Dispose();
             base.Dispose(disposing);
         }
     }
