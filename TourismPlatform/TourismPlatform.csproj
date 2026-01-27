@@ -278,10 +278,10 @@
     <Content Include="Views\TourPackage\MyPackages.cshtml" />
     <Content Include="Views\Home\Review.cshtml" />
     <Content Include="Views\Tourist\MyProfile.cshtml" />
+    <Content Include="Views\TourPackage\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Tours\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202601040542388_InitialCreate.resx">

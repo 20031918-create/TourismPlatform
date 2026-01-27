@@ -45,12 +45,14 @@ namespace TourismPlatform.Controllers
 
         // -----------------------------
         // PUBLIC: Package details
+        // FIX: If id is missing, redirect to Index (prevents HTTP 400)
         // -----------------------------
         [AllowAnonymous]
         public ActionResult Details(int? id)
         {
+            // ✅ Prevent "/TourPackage/Details" from throwing 400
             if (id == null)
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return RedirectToAction("Index");
 
             var tourPackage = db.TourPackages
                 .Include(t => t.TravelAgency.User)
@@ -72,7 +74,7 @@ namespace TourismPlatform.Controllers
         }
 
         // -----------------------------
-        // AGENCY: List my packages (modification options live here)
+        // AGENCY: List my packages
         // -----------------------------
         [Authorize]
         public ActionResult MyPackages()
@@ -118,12 +120,13 @@ namespace TourismPlatform.Controllers
 
             tourPackage.TravelAgencyId = userId;
 
-            // sensible defaults
+            // defaults
             tourPackage.CreatedDate = DateTime.Now;
             tourPackage.IsActive = true;
 
-            // If you want slots to start equal to max group size:
-            tourPackage.AvailableSlots = tourPackage.MaxGroupSize;
+            // if you want slots to start equal to max group size
+            if (tourPackage.AvailableSlots <= 0)
+                tourPackage.AvailableSlots = tourPackage.MaxGroupSize;
 
             db.TourPackages.Add(tourPackage);
             db.SaveChanges();
@@ -161,7 +164,6 @@ namespace TourismPlatform.Controllers
             if (!db.TravelAgencies.Any(a => a.Id == userId))
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-            // Pull existing record from DB (prevents overposting / tampering)
             var existing = db.TourPackages.FirstOrDefault(tp => tp.Id == model.Id && tp.TravelAgencyId == userId);
             if (existing == null)
                 return HttpNotFound();
@@ -169,7 +171,6 @@ namespace TourismPlatform.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Update only allowed fields
             existing.PackageName = model.PackageName;
             existing.Description = model.Description;
             existing.Destination = model.Destination;
@@ -183,8 +184,7 @@ namespace TourismPlatform.Controllers
             existing.Exclusions = model.Exclusions;
             existing.IsActive = model.IsActive;
 
-            // Optional: only set AvailableSlots if you WANT agencies to edit it manually.
-            // If bookings control slots, you may want to remove this line.
+            // keep slots editable only if your project requires it
             existing.AvailableSlots = model.AvailableSlots;
 
             db.SaveChanges();
@@ -194,7 +194,7 @@ namespace TourismPlatform.Controllers
         }
 
         // -----------------------------
-        // AGENCY: Deactivate (soft delete)
+        // AGENCY: Delete (soft delete)
         // -----------------------------
         [Authorize]
         public ActionResult Delete(int? id)
@@ -226,7 +226,6 @@ namespace TourismPlatform.Controllers
             if (tourPackage == null)
                 return HttpNotFound();
 
-            // Soft delete
             tourPackage.IsActive = false;
             db.SaveChanges();
 

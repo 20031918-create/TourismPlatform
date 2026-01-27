@@ -1,0 +1,83 @@
+﻿@model TourismPlatform.Models.TourPackage
+
+@{
+    ViewBag.Title = "Tour Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+
+        <!-- LEFT: IMAGE -->
+        <div class="col-md-6 mb-4">
+            <img src="@(
+                string.IsNullOrEmpty(Model.ImageUrl)
+                ? "https://via.placeholder.com/800x500?text=Tour+Image"
+                : Model.ImageUrl
+            )"
+                 class="img-fluid rounded shadow"
+                 alt="Tour Image" />
+        </div>
+
+        <!-- RIGHT: DETAILS -->
+        <div class="col-md-6">
+
+            <h2 class="fw-bold mb-2">@Model.PackageName</h2>
+
+            <p class="text-muted mb-3">
+                <i class="fas fa-map-marker-alt"></i>
+                @Model.Destination
+            </p>
+
+            <h4 class="text-primary mb-3">
+                @Model.PricePerPerson.ToString("C")
+                <span class="fs-6 text-muted">per person</span>
+            </h4>
+
+            <div class="mb-3">
+                <span class="badge bg-info me-2">@Model.DurationDays Days</span>
+                <span class="badge bg-success">@Model.AvailableSlots slots left</span>
+            </div>
+
+            <hr />
+
+            <h5>Description</h5>
+            <p>@Model.Description</p>
+
+            <hr />
+
+            <p><strong>Start Date:</strong> @Model.StartDate.ToString("dd MMM yyyy")</p>
+            <p><strong>End Date:</strong> @Model.EndDate.ToString("dd MMM yyyy")</p>
+
+            <!-- ✅ FIXED: show real agency name -->
+            <p>
+                <strong>Travel Agency:</strong>
+                @(Model.TravelAgency != null
+                    ? Model.TravelAgency.AgencyName
+                    : "Not available")
+            </p>
+
+            <hr />
+
+            <!-- BOOKING BUTTON -->
+            @if (Model.AvailableSlots > 0)
+            {
+                <a href="@Url.Action("Create", "Booking", new { packageId = Model.Id })"
+                   class="btn btn-primary btn-lg">
+                    <i class="fas fa-calendar-check"></i>
+                    Book Now
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary btn-lg" disabled>Sold Out</button>
+            }
+
+            <a href="@Url.Action("Index", "TourPackage")"
+               class="btn btn-outline-secondary ms-2">
+                Back to Tours
+            </a>
+
+        </div>
+    </div>
+</div>
