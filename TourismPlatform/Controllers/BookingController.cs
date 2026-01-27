@@ -26,10 +26,7 @@ namespace TourismPlatform.Controllers
             if (tour == null)
                 return HttpNotFound();
 
-            // send tour to view for display
-            ViewBag.Tour = tour;
-
-            // prepare model
+            // Always pass a model to the view
             var model = new Booking
             {
                 TourPackageId = tour.Id,
@@ -37,6 +34,7 @@ namespace TourismPlatform.Controllers
                 TotalAmount = tour.PricePerPerson * 1
             };
 
+            ViewBag.Tour = tour;
             return View(model);
         }
 
@@ -45,49 +43,56 @@ namespace TourismPlatform.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(Booking booking)
         {
-            // TourPackageId MUST exist
+            if (booking == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            // Reload tour (needed for validation + pricing + redisplay)
             var tour = db.TourPackages.FirstOrDefault(t => t.Id == booking.TourPackageId);
             if (tour == null)
-            {
-                ModelState.AddModelError("", "Selected tour package does not exist.");
-                return View(booking);
-            }
+                return HttpNotFound();
 
-            // For redisplay if validation fails
+            // Important: keep tour for redisplay when errors happen
             ViewBag.Tour = tour;
 
-            // Set required fields that should NOT come from the form
             var userId = User.Identity.GetUserId();
+
+            // Ensure Tourist row exists (prevents FK / DbUpdateException)
+            var touristExists = db.Tourists.Any(t => t.Id == userId);
+            if (!touristExists)
+            {
+                db.Tourists.Add(new Tourist
+                {
+                    Id = userId,
+                    RegistrationDate = DateTime.Now
+                });
+                db.SaveChanges();
+            }
+
+            // Attach logged-in user to booking
             booking.TouristId = userId;
-            booking.BookingDate = DateTime.Now;
 
-            // IMPORTANT: remove required fields from ModelState that are set server-side
-            ModelState.Remove("TouristId");
+            // Calculate total server-side
+            booking.TotalAmount = tour.PricePerPerson * booking.NumberOfParticipants;
 
-            // Basic validation
-            if (booking.NumberOfParticipants < 1)
-                ModelState.AddModelError("NumberOfParticipants", "Number of participants must be at least 1.");
+            // Validation
+            if (booking.NumberOfParticipants < 1 || booking.NumberOfParticipants > 50)
+                ModelState.AddModelError("NumberOfParticipants", "Number of participants must be between 1 and 50.");
 
             if (booking.NumberOfParticipants > tour.AvailableSlots)
                 ModelState.AddModelError("NumberOfParticipants", "Not enough available slots for this tour.");
 
-            // Calculate amount on server (never trust client)
-            booking.TotalAmount = tour.PricePerPerson * booking.NumberOfParticipants;
-
             if (!ModelState.IsValid)
             {
-                // stay on page, show validation
+                // Return the same model back so the view doesn't get null
                 return View(booking);
             }
 
             // Reduce slots
             tour.AvailableSlots -= booking.NumberOfParticipants;
 
-            // Save booking
             db.Bookings.Add(booking);
             db.SaveChanges();
 
-            // Redirect to confirmation
             return RedirectToAction("Confirmation", new { id = booking.Id });
         }
 
@@ -104,10 +109,21 @@ namespace TourismPlatform.Controllers
             if (booking == null)
                 return HttpNotFound();
 
-            // Security: ensure user can only see their own booking
-            var userId = User.Identity.GetUserId();
-            if (booking.TouristId != userId)
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+            return View(booking);
+        }
+
+        // GET: Booking/Details/5 (optional, used by dashboard "eye" button)
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+            var booking = db.Bookings
+                .Include(b => b.TourPackage)
+                .FirstOrDefault(b => b.Id == id.Value);
+
+            if (booking == null)
+                return HttpNotFound();
 
             return View(booking);
         }
