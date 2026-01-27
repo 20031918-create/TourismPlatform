@@ -49,20 +49,22 @@
             <p><strong>Start Date:</strong> @Model.StartDate.ToString("dd MMM yyyy")</p>
             <p><strong>End Date:</strong> @Model.EndDate.ToString("dd MMM yyyy")</p>
 
-            <!-- ✅ FIXED: show real agency name -->
+            <!-- ✅ FIXED: show real agency name safely -->
             <p>
                 <strong>Travel Agency:</strong>
-                @(Model.TravelAgency != null
-                    ? Model.TravelAgency.AgencyName
-                    : "Not available")
+                @(
+                    Model.TravelAgency != null && !string.IsNullOrEmpty(Model.TravelAgency.AgencyName)
+                        ? Model.TravelAgency.AgencyName
+                        : "Not available"
+                )
             </p>
 
             <hr />
 
-            <!-- BOOKING BUTTON -->
+            <!-- ✅ FIXED: Booking button uses tourPackageId (must match controller parameter) -->
             @if (Model.AvailableSlots > 0)
             {
-                <a href="@Url.Action("Create", "Booking", new { packageId = Model.Id })"
+                <a href="@Url.Action("Create", "Booking", new { tourPackageId = Model.Id })"
                    class="btn btn-primary btn-lg">
                     <i class="fas fa-calendar-check"></i>
                     Book Now

@@ -19,6 +19,7 @@ namespace TourismPlatform.Models
         [Range(1, 50, ErrorMessage = "Number of participants must be between 1 and 50")]
         [Display(Name = "Number of Participants")]
         public int NumberOfParticipants { get; set; }
+
         [Display(Name = "Total Amount")]
         public decimal TotalAmount { get; set; }
 

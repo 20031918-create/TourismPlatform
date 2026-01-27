@@ -13,169 +13,108 @@ namespace TourismPlatform.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // Create Booking
+        // GET: Booking/Create?tourPackageId=2
         public ActionResult Create(int? tourPackageId)
         {
             if (tourPackageId == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
-            var tourPackage = db.TourPackages
+            var tour = db.TourPackages
                 .Include(t => t.TravelAgency)
-                .FirstOrDefault(t => t.Id == tourPackageId);
+                .FirstOrDefault(t => t.Id == tourPackageId.Value);
 
-            if (tourPackage == null)
-            {
+            if (tour == null)
                 return HttpNotFound();
-            }
 
-            if (tourPackage.AvailableSlots <= 0)
+            // send tour to view for display
+            ViewBag.Tour = tour;
+
+            // prepare model
+            var model = new Booking
             {
-                TempData["Error"] = "Sorry, this tour package is fully booked.";
-                return RedirectToAction("Details", "TourPackage", new { id = tourPackageId });
-            }
+                TourPackageId = tour.Id,
+                NumberOfParticipants = 1,
+                TotalAmount = tour.PricePerPerson * 1
+            };
 
-            ViewBag.TourPackage = tourPackage;
-            return View();
+            return View(model);
         }
 
+        // POST: Booking/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Booking booking)
         {
-            if (ModelState.IsValid)
+            // TourPackageId MUST exist
+            var tour = db.TourPackages.FirstOrDefault(t => t.Id == booking.TourPackageId);
+            if (tour == null)
             {
-                var tourPackage = db.TourPackages.Find(booking.TourPackageId);
-                if (tourPackage == null)
-                {
-                    return HttpNotFound();
-                }
-
-                // Validate available slots
-                if (booking.NumberOfParticipants > tourPackage.AvailableSlots)
-                {
-                    ModelState.AddModelError("NumberOfParticipants",
-                        $"Only {tourPackage.AvailableSlots} slots are available.");
-                    ViewBag.TourPackage = tourPackage;
-                    return View(booking);
-                }
-
-                // Calculate total amount
-                booking.TouristId = User.Identity.GetUserId();
-                booking.TotalAmount = tourPackage.PricePerPerson * booking.NumberOfParticipants;
-                booking.BookingDate = DateTime.Now;
-                booking.BookingStatus = "Pending";
-                booking.PaymentStatus = "Pending";
-
-                // Update available slots
-                tourPackage.AvailableSlots -= booking.NumberOfParticipants;
-
-                db.Bookings.Add(booking);
-                db.Entry(tourPackage).State = EntityState.Modified;
-                db.SaveChanges();
-
-                TempData["Success"] = "Booking created successfully! Please proceed with payment.";
-                return RedirectToAction("Payment", new { id = booking.Id });
+                ModelState.AddModelError("", "Selected tour package does not exist.");
+                return View(booking);
             }
 
-            var tourPkg = db.TourPackages
-                .Include(t => t.TravelAgency)
-                .FirstOrDefault(t => t.Id == booking.TourPackageId);
-            ViewBag.TourPackage = tourPkg;
+            // For redisplay if validation fails
+            ViewBag.Tour = tour;
 
-            return View(booking);
+            // Set required fields that should NOT come from the form
+            var userId = User.Identity.GetUserId();
+            booking.TouristId = userId;
+            booking.BookingDate = DateTime.Now;
+
+            // IMPORTANT: remove required fields from ModelState that are set server-side
+            ModelState.Remove("TouristId");
+
+            // Basic validation
+            if (booking.NumberOfParticipants < 1)
+                ModelState.AddModelError("NumberOfParticipants", "Number of participants must be at least 1.");
+
+            if (booking.NumberOfParticipants > tour.AvailableSlots)
+                ModelState.AddModelError("NumberOfParticipants", "Not enough available slots for this tour.");
+
+            // Calculate amount on server (never trust client)
+            booking.TotalAmount = tour.PricePerPerson * booking.NumberOfParticipants;
+
+            if (!ModelState.IsValid)
+            {
+                // stay on page, show validation
+                return View(booking);
+            }
+
+            // Reduce slots
+            tour.AvailableSlots -= booking.NumberOfParticipants;
+
+            // Save booking
+            db.Bookings.Add(booking);
+            db.SaveChanges();
+
+            // Redirect to confirmation
+            return RedirectToAction("Confirmation", new { id = booking.Id });
         }
 
-        // Payment (simplified for demo)
-        public ActionResult Payment(int? id)
+        // GET: Booking/Confirmation/5
+        public ActionResult Confirmation(int? id)
         {
             if (id == null)
-            {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
 
             var booking = db.Bookings
                 .Include(b => b.TourPackage)
-                .Include(b => b.Tourist.User)
-                .FirstOrDefault(b => b.Id == id);
+                .FirstOrDefault(b => b.Id == id.Value);
 
             if (booking == null)
-            {
                 return HttpNotFound();
-            }
 
-            // Ensure booking belongs to current user
-            if (booking.TouristId != User.Identity.GetUserId())
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-            }
-
-            return View(booking);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult ProcessPayment(int bookingId)
-        {
-            var booking = db.Bookings.Find(bookingId);
-            if (booking == null || booking.TouristId != User.Identity.GetUserId())
-            {
-                return HttpNotFound();
-            }
-
-            // Simulate payment processing
-            booking.PaymentStatus = "Paid";
-            booking.BookingStatus = "Confirmed";
-
-            db.Entry(booking).State = EntityState.Modified;
-            db.SaveChanges();
-
-            TempData["Success"] = "Payment successful! Your booking is confirmed.";
-            return RedirectToAction("MyBookings", "Tourist");
-        }
-
-        // Booking Details
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            var booking = db.Bookings
-                .Include(b => b.TourPackage.TravelAgency)
-                .Include(b => b.Tourist.User)
-                .Include(b => b.Feedback)
-                .FirstOrDefault(b => b.Id == id);
-
-            if (booking == null)
-            {
-                return HttpNotFound();
-            }
-
+            // Security: ensure user can only see their own booking
             var userId = User.Identity.GetUserId();
-            var user = db.Users.Find(userId);
-
-            // Check authorization
-            if (user.UserType == "Tourist" && booking.TouristId != userId)
-            {
+            if (booking.TouristId != userId)
                 return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-            }
-            else if (user.UserType == "TravelAgency" && booking.TourPackage.TravelAgencyId != userId)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-            }
 
             return View(booking);
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                db.Dispose();
-            }
+            if (disposing) db.Dispose();
             base.Dispose(disposing);
         }
     }

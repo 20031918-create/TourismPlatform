@@ -1,0 +1,57 @@
+﻿@model TourismPlatform.Models.Booking
+@using TourismPlatform.Models
+
+@{
+    ViewBag.Title = "Book Tour";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var tour = ViewBag.Tour as TourPackage;
+}
+
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4">Book Tour</h2>
+
+    @* Shows all general errors *@
+    @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+    @if (tour != null)
+    {
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title">@tour.PackageName</h4>
+                <p class="text-muted mb-2">
+                    <i class="fas fa-map-marker-alt"></i> @tour.Destination
+                </p>
+                <p class="mb-2">@tour.Description</p>
+
+                <p class="mb-1"><strong>Price per person:</strong> @tour.PricePerPerson.ToString("C")</p>
+                <p class="mb-0"><strong>Slots available:</strong> @tour.AvailableSlots</p>
+            </div>
+        </div>
+    }
+
+    @using (Html.BeginForm("Create", "Booking", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        @* MUST post TourPackageId *@
+        @Html.HiddenFor(m => m.TourPackageId)
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="mb-3">
+                    @Html.LabelFor(m => m.NumberOfParticipants, new { @class = "form-label fw-bold" })
+                    @Html.TextBoxFor(m => m.NumberOfParticipants, new { @class = "form-control", type = "number", min = "1", max = "50" })
+                    @Html.ValidationMessageFor(m => m.NumberOfParticipants, "", new { @class = "text-danger" })
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">
+                    Confirm Booking
+                </button>
+
+                <a href="@Url.Action("Index", "TourPackage")" class="btn btn-outline-secondary btn-lg ms-2">
+                    Cancel
+                </a>
+            </div>
+        </div>
+    }
+</div>
